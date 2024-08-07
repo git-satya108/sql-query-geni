@@ -7,9 +7,7 @@ from PandaSQLite import PandaSQLiteDB
 from sqlalchemy import create_engine
 
 # Load OpenAI API key
-load_dotenv(find_dotenv(), override=True)
-client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
-openai.api_key = os.getenv("OPENAI_API_KEY")
+openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize PandaSQLiteDB
 db = PandaSQLiteDB("database.db")
@@ -21,7 +19,6 @@ if "chat_history" not in st.session_state:
 # Display the banner image
 st.image("imagebanner1.png", use_column_width=True)
 
-
 # Function to load and read multiple Excel files
 def load_excel_files(uploaded_files):
     all_sheets = {}
@@ -31,7 +28,6 @@ def load_excel_files(uploaded_files):
             all_sheets[sheet_name] = pd.read_excel(xls, sheet_name)
     return all_sheets
 
-
 # Function to analyze data and provide recommendations
 def analyze_data(sheets):
     response = ""
@@ -40,16 +36,13 @@ def analyze_data(sheets):
         if df.isnull().values.any():
             response += f"Warning: The sheet '{sheet_name}' contains missing values. This might affect SQL generation.\n"
         prompt = f"Explain the contents of the following table:\n{df.head()}"
-        explanation = chat_with_assistant(prompt,
-                                          "You are a helpful assistant, SQL programmer, data scientist, and generative AI specialist.")
+        explanation = chat_with_assistant(prompt, "You are a helpful assistant, SQL programmer, data scientist, and generative AI specialist.")
         response += f"Explanation: {explanation}\n\n"
     return response
-
 
 # Chat with the assistant using OpenAI API
 def chat_with_assistant(prompt, system_message):
     try:
-        client = openai.OpenAI()
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
@@ -62,7 +55,6 @@ def chat_with_assistant(prompt, system_message):
     except Exception as e:
         return None
 
-
 # Create tables in SQLite from Excel sheets
 def create_tables_from_sheets(sheets):
     for sheet_name, df in sheets.items():
@@ -72,7 +64,6 @@ def create_tables_from_sheets(sheets):
             st.success(f"Table created for sheet: {sheet_name}")
         except Exception as e:
             st.error(f"An error occurred while creating the table {sheet_name}: {str(e)}")
-
 
 # Upload and process documents
 uploaded_files = st.file_uploader("Upload your Excel files", accept_multiple_files=True, type=["xlsx"])
@@ -93,8 +84,7 @@ if st.button("Add Data"):
 
 # SQL query generation section with example prompts
 st.markdown("## Generate SQL queries based on the uploaded data or provided schema:")
-prompt = st.text_area("Enter your prompt here (e.g., 'Select all data from the student performance table'):",
-                      height=100)
+prompt = st.text_area("Enter your prompt here (e.g., 'Select all data from the student performance table'):", height=100)
 table_name = st.text_input("Enter the table name:")
 system_message = (
     "You are a well-versed and proficient SQL programmer and you are excellent in generating and executing SQL queries. "
@@ -116,7 +106,7 @@ if st.button("Generate SQL Query"):
 
             sql_result = chat_with_assistant(prompt, system_message)
             st.write(f"Generated SQL Query:\n{sql_result}")
-
+            
             try:
                 # Extract the actual SQL query from the response
                 sql_query = extract_sql_query(sql_result)
@@ -130,11 +120,9 @@ if st.button("Generate SQL Query"):
                 "generator": sql_result
             })
         else:
-            st.error(
-                f"Table '{table_name}' not found in the uploaded data. Available tables are: {', '.join(st.session_state['sheets'].keys())}.")
+            st.error(f"Table '{table_name}' not found in the uploaded data. Available tables are: {', '.join(st.session_state['sheets'].keys())}.")
     else:
         st.error("Please enter a prompt to generate an SQL query.")
-
 
 # Function to extract the actual SQL query from the assistant's response
 def extract_sql_query(response):
@@ -143,7 +131,6 @@ def extract_sql_query(response):
         if "SELECT" in line.upper():
             return '\n'.join(lines[i:]).strip()
     return response
-
 
 # Adjust prompt box and buttons
 st.markdown("""
