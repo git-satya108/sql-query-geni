@@ -18,3 +18,4 @@ werkzeug
 langchain-community
 langchain_openai
 PandaSQLite
+openpyxl
