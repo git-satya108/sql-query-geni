@@ -112,10 +112,11 @@ if st.button("Generate SQL Query"):
             try:
                 # Extract the actual SQL query from the response
                 sql_query = extract_sql_query(sql_result)
-                query_result = pd.read_sql_query(sql_query, engine)
-                st.write(query_result)
+                explanation_prompt = f"Explain how the following SQL query is executed:\n{sql_query}"
+                explanation = chat_with_assistant(explanation_prompt, "You are a helpful assistant, SQL programmer, and data scientist.")
+                st.write(f"Execution Explanation:\n{explanation}")
             except Exception as e:
-                st.error(f"An error occurred while executing the SQL query: {str(e)}")
+                st.error(f"An error occurred while generating the explanation: {str(e)}")
             st.session_state.chat_history.append({
                 "user": prompt,
                 "generator": sql_result
