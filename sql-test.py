@@ -6,7 +6,7 @@ import pandas as pd
 from PandaSQLite import PandaSQLiteDB
 from sqlalchemy import create_engine
 
-# Load OpenAI API key
+# Load OpenAI API key from Streamlit secrets
 openai.api_key = st.secrets["OPENAI_API_KEY"]
 
 # Initialize PandaSQLiteDB
@@ -43,6 +43,7 @@ def analyze_data(sheets):
 # Chat with the assistant using OpenAI API
 def chat_with_assistant(prompt, system_message):
     try:
+        client = openai.OpenAI()
         response = client.chat.completions.create(
             model="gpt-4",
             messages=[
@@ -53,6 +54,7 @@ def chat_with_assistant(prompt, system_message):
         message = response.choices[0].message.content
         return message
     except Exception as e:
+        st.error(f"An error occurred: {str(e)}")
         return None
 
 # Create tables in SQLite from Excel sheets
@@ -110,11 +112,10 @@ if st.button("Generate SQL Query"):
             try:
                 # Extract the actual SQL query from the response
                 sql_query = extract_sql_query(sql_result)
-                explanation_prompt = f"Explain how the following SQL query will be executed:\n{sql_query}"
-                explanation = chat_with_assistant(explanation_prompt, system_message)
-                st.write(f"Execution Explanation:\n{explanation}")
+                query_result = pd.read_sql_query(sql_query, engine)
+                st.write(query_result)
             except Exception as e:
-                pass  # Do not show error messages
+                st.error(f"An error occurred while executing the SQL query: {str(e)}")
             st.session_state.chat_history.append({
                 "user": prompt,
                 "generator": sql_result
