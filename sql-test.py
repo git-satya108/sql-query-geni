@@ -8,6 +8,7 @@ from sqlalchemy import create_engine
 
 # Load OpenAI API key
 load_dotenv(find_dotenv(), override=True)
+client = OpenAI(api_key=st.secrets["OPENAI_API_KEY"])
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 # Initialize PandaSQLiteDB
