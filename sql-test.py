@@ -43,14 +43,14 @@ def analyze_data(sheets):
 # Chat with the assistant using OpenAI API
 def chat_with_assistant(prompt, system_message):
     try:
-        response = openai.ChatCompletion.create(
+        response = client.chat.completions.create(
             model="gpt-4",
             messages=[
                 {"role": "system", "content": system_message},
                 {"role": "user", "content": prompt},
             ]
         )
-        message = response.choices[0].message['content']
+        message = response.choices[0].message.content
         return message
     except Exception as e:
         return None
