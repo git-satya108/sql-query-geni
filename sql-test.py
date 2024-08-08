@@ -109,14 +109,9 @@ if st.button("Generate SQL Query"):
             sql_result = chat_with_assistant(prompt, system_message)
             st.write(f"Generated SQL Query:\n{sql_result}")
             
-            try:
-                # Extract the actual SQL query from the response
-                sql_query = extract_sql_query(sql_result)
-                explanation_prompt = f"Explain how the following SQL query is executed:\n{sql_query}"
-                explanation = chat_with_assistant(explanation_prompt, "You are a helpful assistant, SQL programmer, and data scientist.")
-                st.write(f"Execution Explanation:\n{explanation}")
-            except Exception as e:
-                st.write(f"Execution Explanation: Unable to generate explanation.")
+            explanation_prompt = f"Explain how the following SQL query is executed:\n{sql_result}"
+            explanation = chat_with_assistant(explanation_prompt, "You are a helpful assistant, SQL programmer, and data scientist.")
+            st.write(f"Execution Explanation:\n{explanation}")
             st.session_state.chat_history.append({
                 "user": prompt,
                 "generator": sql_result
@@ -125,14 +120,6 @@ if st.button("Generate SQL Query"):
             st.error(f"Table '{table_name}' not found in the uploaded data. Available tables are: {', '.join(st.session_state['sheets'].keys())}.")
     else:
         st.error("Please enter a prompt to generate an SQL query.")
-
-# Function to extract the actual SQL query from the assistant's response
-def extract_sql_query(response):
-    lines = response.split('\n')
-    for i, line in enumerate(lines):
-        if "SELECT" in line.upper():
-            return '\n'.join(lines[i:]).strip()
-    return response
 
 # Adjust prompt box and buttons
 st.markdown("""
