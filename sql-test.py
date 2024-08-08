@@ -116,7 +116,7 @@ if st.button("Generate SQL Query"):
                 explanation = chat_with_assistant(explanation_prompt, "You are a helpful assistant, SQL programmer, and data scientist.")
                 st.write(f"Execution Explanation:\n{explanation}")
             except Exception as e:
-                st.error(f"An error occurred while generating the explanation: {str(e)}")
+                st.write(f"Execution Explanation: Unable to generate explanation.")
             st.session_state.chat_history.append({
                 "user": prompt,
                 "generator": sql_result
